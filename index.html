@@ -298,11 +298,25 @@ details[open] summary .chev{transform:rotate(90deg);}
   function sync(a,b){ a.addEventListener('input',function(){b.value=a.value;calc();}); }
   sync(clientsR, el.clients); sync(el.clients, clientsR);
   sync(marginR, el.margin); sync(el.margin, marginR);
-  ['oklad','planM','planC','fund','first'].forEach(function(k){el[k].addEventListener('input',calc);});
-  el.fund.addEventListener('change',calc);
+  ['oklad','planM','planC','first'].forEach(function(k){el[k].addEventListener('input',calc);});
+
+  function setSliders(senior){
+    marginR.max = senior?100000:30000;
+    clientsR.max = senior?40:10;
+    marginR.value = el.margin.value; clientsR.value = el.clients.value;
+  }
+  el.fund.addEventListener('change',function(){
+    var sr=(el.fund.value==='80');
+    el.planM.value  = sr?45000:5000;   // план за квартал / за месяц
+    el.planC.value  = sr?15:3;
+    el.margin.value = sr?45000:5000;   // пример-факт под период
+    el.clients.value= sr?15:3;
+    setSliders(sr);
+    calc();
+  });
 
   load();
-  clientsR.value=el.clients.value; marginR.value=el.margin.value;
+  setSliders(el.fund.value==='80');
   calc();
 })();
 </script>
