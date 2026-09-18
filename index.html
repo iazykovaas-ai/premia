@@ -134,7 +134,7 @@ details[open] summary .chev{transform:rotate(90deg);}
         <div class="plan-row">
           <div class="setfield">
             <label for="planM">Маржа, $/мес</label>
-            <input id="planM" type="number" min="0" step="500" value="10000" inputmode="numeric">
+            <input id="planM" type="number" min="0" step="500" value="5000" inputmode="numeric">
           </div>
           <div class="setfield">
             <label for="planC">Новых клиентов</label>
@@ -154,19 +154,21 @@ details[open] summary .chev{transform:rotate(90deg);}
       <div class="field">
         <div class="flabel">
           <span>Маржа этих клиентов</span>
-          <label class="valbox"><input id="margin" type="number" min="0" max="200000" step="500" value="12000" inputmode="numeric" aria-label="Факт: маржа"> <span class="unit">$/мес</span></label>
+          <label class="valbox"><input id="margin" type="number" min="0" max="200000" step="500" value="5000" inputmode="numeric" aria-label="Факт: маржа"> <span class="unit">$/мес</span></label>
         </div>
-        <input id="marginR" type="range" min="0" max="30000" step="500" value="12000" aria-label="Маржа, ползунок">
+        <input id="marginR" type="range" min="0" max="30000" step="500" value="5000" aria-label="Маржа, ползунок">
       </div>
 
-      <details id="settings">
+      <details id="settings" open>
         <summary><span class="chev">▶</span> Ещё настройки</summary>
         <div class="settings">
           <div class="setfield">
-            <label for="fund">Премфонд, % оклада (при 100%)</label>
-            <input id="fund" type="number" min="0" max="200" step="5" value="60" inputmode="numeric">
+            <label for="fund">Доля премии, % оклада (при 100%)</label>
+            <input id="fund" type="number" value="60" readonly tabindex="-1" aria-readonly="true"
+              style="background:var(--inset);color:var(--muted);cursor:not-allowed;">
           </div>
           <label class="chk"><input id="first" type="checkbox"> Первый месяц работы (порогов нет)</label>
+          <div id="autoNote" style="grid-column:1/-1;font-size:.8rem;color:var(--muted);font-weight:600;line-height:1.4;"></div>
         </div>
       </details>
     </section>
@@ -175,29 +177,29 @@ details[open] summary .chev{transform:rotate(90deg);}
     <section class="card result">
       <h2>Мой доход</h2>
       <p class="income-label">Всего за месяц</p>
-      <div class="income"><span id="income">421 000</span><span class="cur">₽</span></div>
+      <div class="income"><span id="income">400 000</span><span class="cur">₽</span></div>
 
       <div class="bar" aria-hidden="true">
         <div class="okl" id="barOkl" style="width:40%"></div>
-        <div class="prem" id="barPrem" style="width:16%"></div>
+        <div class="prem" id="barPrem" style="width:24%"></div>
         <div class="cap" id="barCap" style="left:100%"></div>
       </div>
       <div class="caplbl">▲ потолок дохода (КЭП)</div>
 
       <div class="split">
         <span>Оклад <b id="sOkl">250 000 ₽</b></span><span>+</span>
-        <span>Премия <b id="sPrem">171 000 ₽</b></span>
+        <span>Премия <b id="sPrem">150 000 ₽</b></span>
       </div>
 
       <div class="prem-line">
         <span class="pl-lbl">Премия за месяц</span>
-        <span class="pl-val"><span id="premBig">171 000</span> ₽</span>
+        <span class="pl-val"><span id="premBig">150 000</span> ₽</span>
       </div>
 
       <div class="metrics">
-        <div class="metric"><div class="m-num" id="vProfit">120%</div><div class="m-lbl">по марже<br>(вес 70%)</div></div>
+        <div class="metric"><div class="m-num" id="vProfit">100%</div><div class="m-lbl">по марже<br>(вес 70%)</div></div>
         <div class="metric"><div class="m-num" id="vClients">100%</div><div class="m-lbl">по клиентам<br>(вес 30%)</div></div>
-        <div class="metric big"><div class="m-num" id="vTotal">114%</div><div class="m-lbl">выполнение<br>плана</div></div>
+        <div class="metric big"><div class="m-num" id="vTotal">100%</div><div class="m-lbl">выполнение<br>плана</div></div>
       </div>
 
       <div class="note warn" id="noteWarn">⛔ <span></span></div>
@@ -224,21 +226,28 @@ details[open] summary .chev{transform:rotate(90deg);}
 
   function load(){
     try{var s=JSON.parse(localStorage.getItem('premia_seila')||'{}');
-      ['clients','margin','oklad','planM','planC','fund'].forEach(function(k){if(s[k]!=null)el[k].value=s[k];});
+      ['clients','margin','oklad','planM','planC'].forEach(function(k){if(s[k]!=null)el[k].value=s[k];});
       if(s.first!=null)el.first.checked=s.first;
     }catch(e){}
   }
   function save(){
     try{localStorage.setItem('premia_seila',JSON.stringify({
       clients:el.clients.value,margin:el.margin.value,oklad:el.oklad.value,
-      planM:el.planM.value,planC:el.planC.value,fund:el.fund.value,first:el.first.checked
+      planM:el.planM.value,planC:el.planC.value,first:el.first.checked
     }));}catch(e){}
   }
 
   function calc(){
     var clients=+el.clients.value||0, margin=+el.margin.value||0;
     var oklad=+el.oklad.value||0, planM=+el.planM.value||0, planC=+el.planC.value||0;
-    var fund=(+el.fund.value||0)/100, first=el.first.checked;
+    var fund=(+el.fund.value||0)/100;
+    // до 1 октября 2026 — пилот без порогов (автоматически); галочка — ручной запас
+    var autoFirst = (new Date() < new Date(2026,9,1));
+    var first = autoFirst || el.first.checked;
+    var an=document.getElementById('autoNote');
+    if(an){ an.textContent = autoFirst
+      ? 'Сейчас сентябрь — пилот: пороги пока отключены автоматически. С 1 октября включатся сами.'
+      : 'Пороги активны (50% / 33%). Галочку ставь только если у сотрудника реально первый месяц.'; }
 
     var vm = planM>0 ? margin/planM : (margin>0?CAP:0);
     var vc = planC>0 ? clients/planC : (clients>0?CAP:0);
@@ -276,7 +285,7 @@ details[open] summary .chev{transform:rotate(90deg);}
   function sync(a,b){ a.addEventListener('input',function(){b.value=a.value;calc();}); }
   sync(clientsR, el.clients); sync(el.clients, clientsR);
   sync(marginR, el.margin); sync(el.margin, marginR);
-  ['oklad','planM','planC','fund','first'].forEach(function(k){el[k].addEventListener('input',calc);});
+  ['oklad','planM','planC','first'].forEach(function(k){el[k].addEventListener('input',calc);});
 
   load();
   clientsR.value=el.clients.value; marginR.value=el.margin.value;
