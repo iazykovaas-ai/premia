@@ -129,11 +129,11 @@ details[open] summary .chev{transform:rotate(90deg);}
       </div>
 
       <div class="plan">
-        <div class="plan-h">🎯 Мой план на месяц — это 100%</div>
+        <div class="plan-h" id="planH">🎯 Мой план на месяц — это 100%</div>
         <div class="plan-hint">Столько нужно, чтобы выполнить план полностью.</div>
         <div class="plan-row">
           <div class="setfield">
-            <label for="planM">Маржа, $/мес</label>
+            <label for="planM" id="planMlbl">Маржа, $/мес</label>
             <input id="planM" type="number" min="0" step="500" value="5000" inputmode="numeric">
           </div>
           <div class="setfield">
@@ -143,7 +143,7 @@ details[open] summary .chev{transform:rotate(90deg);}
         </div>
       </div>
 
-      <h2 class="mt">Что я приведу за месяц (факт)</h2>
+      <h2 class="mt" id="factH">Что я приведу за месяц (факт)</h2>
       <div class="field">
         <div class="flabel">
           <span>Новых клиентов</span>
@@ -154,7 +154,7 @@ details[open] summary .chev{transform:rotate(90deg);}
       <div class="field">
         <div class="flabel">
           <span>Маржа этих клиентов</span>
-          <label class="valbox"><input id="margin" type="number" min="0" max="200000" step="500" value="5000" inputmode="numeric" aria-label="Факт: маржа"> <span class="unit">$/мес</span></label>
+          <label class="valbox"><input id="margin" type="number" min="0" max="200000" step="500" value="5000" inputmode="numeric" aria-label="Факт: маржа"> <span class="unit" id="marginUnit">$/мес</span></label>
         </div>
         <input id="marginR" type="range" min="0" max="30000" step="500" value="5000" aria-label="Маржа, ползунок">
       </div>
@@ -164,8 +164,11 @@ details[open] summary .chev{transform:rotate(90deg);}
         <div class="settings">
           <div class="setfield">
             <label for="fund">Доля премии, % оклада (при 100%)</label>
-            <input id="fund" type="number" value="60" readonly tabindex="-1" aria-readonly="true"
-              style="background:var(--inset);color:var(--muted);cursor:not-allowed;">
+            <select id="fund" style="font:inherit;font-weight:700;color:var(--ink);background:var(--inset);border:1px solid var(--line);border-radius:9px;padding:8px 11px;outline:0;width:100%;cursor:pointer;">
+              <option value="60">60% — менеджер · за месяц</option>
+              <option value="80">80% — старший менеджер · за квартал</option>
+            </select>
+            <div id="seniorNote" style="font-size:.8rem;font-weight:700;color:var(--gold);line-height:1.4;display:none;">★ Режим старшего менеджера: план, факт и премия считаются за квартал (3 месяца).</div>
           </div>
           <label class="chk"><input id="first" type="checkbox"> Первый месяц работы (порогов нет)</label>
           <div id="autoNote" style="grid-column:1/-1;font-size:.8rem;color:var(--muted);font-weight:600;line-height:1.4;"></div>
@@ -176,7 +179,7 @@ details[open] summary .chev{transform:rotate(90deg);}
     <!-- РЕЗУЛЬТАТ -->
     <section class="card result">
       <h2>Мой доход</h2>
-      <p class="income-label">Всего за месяц</p>
+      <p class="income-label" id="incLbl">Всего за месяц</p>
       <div class="income"><span id="income">400 000</span><span class="cur">₽</span></div>
 
       <div class="bar" aria-hidden="true">
@@ -192,7 +195,7 @@ details[open] summary .chev{transform:rotate(90deg);}
       </div>
 
       <div class="prem-line">
-        <span class="pl-lbl">Премия за месяц</span>
+        <span class="pl-lbl" id="premLbl">Премия за месяц</span>
         <span class="pl-val"><span id="premBig">150 000</span> ₽</span>
       </div>
 
@@ -226,14 +229,14 @@ details[open] summary .chev{transform:rotate(90deg);}
 
   function load(){
     try{var s=JSON.parse(localStorage.getItem('premia_seila')||'{}');
-      ['clients','margin','oklad','planM','planC'].forEach(function(k){if(s[k]!=null)el[k].value=s[k];});
+      ['clients','margin','oklad','planM','planC','fund'].forEach(function(k){if(s[k]!=null)el[k].value=s[k];});
       if(s.first!=null)el.first.checked=s.first;
     }catch(e){}
   }
   function save(){
     try{localStorage.setItem('premia_seila',JSON.stringify({
       clients:el.clients.value,margin:el.margin.value,oklad:el.oklad.value,
-      planM:el.planM.value,planC:el.planC.value,first:el.first.checked
+      planM:el.planM.value,planC:el.planC.value,fund:el.fund.value,first:el.first.checked
     }));}catch(e){}
   }
 
@@ -241,6 +244,15 @@ details[open] summary .chev{transform:rotate(90deg);}
     var clients=+el.clients.value||0, margin=+el.margin.value||0;
     var oklad=+el.oklad.value||0, planM=+el.planM.value||0, planC=+el.planC.value||0;
     var fund=(+el.fund.value||0)/100;
+    var senior=(el.fund.value==='80'); var M=senior?3:1;   // старший = за квартал (3 мес)
+    var per=senior?'квартал':'месяц', perU=senior?'кв':'мес';
+    document.getElementById('incLbl').textContent='Всего за '+per;
+    document.getElementById('premLbl').textContent='Премия за '+per;
+    document.getElementById('planH').textContent='🎯 Мой план на '+per+' — это 100%';
+    document.getElementById('planMlbl').textContent='Маржа, $/'+perU;
+    document.getElementById('factH').textContent='Что я приведу за '+per+' (факт)';
+    document.getElementById('marginUnit').textContent='$/'+perU;
+    document.getElementById('seniorNote').style.display=senior?'block':'none';
     // до 1 октября 2026 — пилот без порогов (автоматически); галочка — ручной запас
     var autoFirst = (new Date() < new Date(2026,9,1));
     var first = autoFirst || el.first.checked;
@@ -255,26 +267,27 @@ details[open] summary .chev{transform:rotate(90deg);}
     var vit = WM*vmC + WC*vcC;
 
     var gate = !first && (vm<THR_M || vc<THR_C);
-    var premium = gate ? 0 : oklad*fund*vit;
-    var income = oklad + premium;
+    var base = oklad*M;                          // оклад за период (мес или квартал)
+    var premium = gate ? 0 : base*fund*vit;
+    var income = base + premium;
     var capped = (vm>CAP+1e-9 || vc>CAP+1e-9);
 
     document.getElementById('income').textContent=fmt(income);
     document.getElementById('premBig').textContent=fmt(premium);
-    document.getElementById('sOkl').textContent=fmt(oklad)+' ₽';
+    document.getElementById('sOkl').textContent=fmt(base)+' ₽';
     document.getElementById('sPrem').textContent=fmt(premium)+' ₽';
     document.getElementById('vProfit').textContent=pct(vm);
     document.getElementById('vClients').textContent=pct(vc);
     document.getElementById('vTotal').textContent= gate ? '0%' : pct(vit);
 
-    var maxIncome = oklad*(1+fund*CAP) || 1;
-    document.getElementById('barOkl').style.width = Math.max(0,Math.min(100, oklad/maxIncome*100))+'%';
+    var maxIncome = base*(1+fund*CAP) || 1;
+    document.getElementById('barOkl').style.width = Math.max(0,Math.min(100, base/maxIncome*100))+'%';
     document.getElementById('barPrem').style.width = Math.max(0,Math.min(100, premium/maxIncome*100))+'%';
 
     var nw=document.getElementById('noteWarn'), nc=document.getElementById('noteCap');
     if(gate){
       var why = vm<THR_M ? 'маржа ниже 50% плана' : 'клиентов меньше 33% плана';
-      nw.querySelector('span').textContent='Порог не пройден ('+why+') — премии за месяц нет, только оклад.';
+      nw.querySelector('span').textContent='Порог не пройден ('+why+') — премии за '+per+' нет, только оклад.';
       nw.classList.add('show');
     } else nw.classList.remove('show');
     nc.classList.toggle('show', capped && !gate);
@@ -285,7 +298,8 @@ details[open] summary .chev{transform:rotate(90deg);}
   function sync(a,b){ a.addEventListener('input',function(){b.value=a.value;calc();}); }
   sync(clientsR, el.clients); sync(el.clients, clientsR);
   sync(marginR, el.margin); sync(el.margin, marginR);
-  ['oklad','planM','planC','first'].forEach(function(k){el[k].addEventListener('input',calc);});
+  ['oklad','planM','planC','fund','first'].forEach(function(k){el[k].addEventListener('input',calc);});
+  el.fund.addEventListener('change',calc);
 
   load();
   clientsR.value=el.clients.value; marginR.value=el.margin.value;
