@@ -314,7 +314,7 @@ details[open] summary .chev{transform:rotate(90deg);}
   }
   el.fund.addEventListener('change',function(){
     var sr=(el.fund.value==='80');
-    el.oklad.value  = sr?400000:0;      // старший — подсказка 400к; менеджер — вводит сам
+    el.oklad.value  = 0;                // оклад вводит сам — и менеджер, и старший
     el.planM.value  = sr?50000:5000;   // план за квартал / за месяц
     el.planC.value  = sr?15:3;
     el.margin.value = sr?50000:5000;   // пример-факт под период
