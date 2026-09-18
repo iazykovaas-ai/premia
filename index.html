@@ -125,7 +125,7 @@ details[open] summary .chev{transform:rotate(90deg);}
 
       <div class="oklad-field">
         <span class="lbl">Мой оклад</span>
-        <label class="valbox"><input id="oklad" type="number" min="0" max="2000000" step="10000" value="0" inputmode="numeric" aria-label="Мой оклад в месяц"> <span class="unit">₽/мес</span></label>
+        <label class="valbox"><input id="oklad" type="text" value="0" inputmode="numeric" aria-label="Мой оклад в месяц"> <span class="unit">₽/мес</span></label>
       </div>
 
       <div class="plan">
@@ -134,7 +134,7 @@ details[open] summary .chev{transform:rotate(90deg);}
         <div class="plan-row">
           <div class="setfield">
             <label for="planM" id="planMlbl">Маржа, $/мес</label>
-            <input id="planM" type="number" min="0" step="500" value="5000" inputmode="numeric">
+            <input id="planM" type="text" value="5000" inputmode="numeric">
           </div>
           <div class="setfield">
             <label for="planC">Новых клиентов</label>
@@ -154,7 +154,7 @@ details[open] summary .chev{transform:rotate(90deg);}
       <div class="field">
         <div class="flabel">
           <span>Маржа этих клиентов</span>
-          <label class="valbox"><input id="margin" type="number" min="0" max="200000" step="500" value="5000" inputmode="numeric" aria-label="Факт: маржа"> <span class="unit" id="marginUnit">$/мес</span></label>
+          <label class="valbox"><input id="margin" type="text" value="5000" inputmode="numeric" aria-label="Факт: маржа"> <span class="unit" id="marginUnit">$/мес</span></label>
         </div>
         <input id="marginR" type="range" min="0" max="30000" step="500" value="5000" aria-label="Маржа, ползунок">
       </div>
@@ -226,6 +226,8 @@ details[open] summary .chev{transform:rotate(90deg);}
 
   function fmt(n){return Math.round(n).toLocaleString('ru-RU');}
   function pct(x){return Math.round(x*100)+'%';}
+  function numVal(v){var n=parseFloat(String(v).replace(/[^\d.-]/g,''));return isFinite(n)?n:0;}
+  function fmtInput(e){var d=e.value.replace(/\D/g,'');e.value=d?(+d).toLocaleString('ru-RU'):'';}
 
   function load(){
     try{var s=JSON.parse(localStorage.getItem('premia_seila')||'{}');
@@ -241,8 +243,8 @@ details[open] summary .chev{transform:rotate(90deg);}
   }
 
   function calc(){
-    var clients=+el.clients.value||0, margin=+el.margin.value||0;
-    var oklad=+el.oklad.value||0, planM=+el.planM.value||0, planC=+el.planC.value||0;
+    var clients=+el.clients.value||0, margin=numVal(el.margin.value);
+    var oklad=numVal(el.oklad.value), planM=numVal(el.planM.value), planC=+el.planC.value||0;
     var fund=(+el.fund.value||0)/100;
     var senior=(el.fund.value==='80'); var M=senior?3:1;   // старший = за квартал (3 мес)
     var per=senior?'квартал':'месяц', perU=senior?'кв':'мес';
@@ -296,14 +298,19 @@ details[open] summary .chev{transform:rotate(90deg);}
   }
 
   function sync(a,b){ a.addEventListener('input',function(){b.value=a.value;calc();}); }
+  // клиенты — обычные числа
   sync(clientsR, el.clients); sync(el.clients, clientsR);
-  sync(marginR, el.margin); sync(el.margin, marginR);
-  ['oklad','planM','planC','first'].forEach(function(k){el[k].addEventListener('input',calc);});
+  // маржа-факт с разделением тысяч
+  marginR.addEventListener('input',function(){ el.margin.value=(+marginR.value).toLocaleString('ru-RU'); calc(); });
+  el.margin.addEventListener('input',function(){ fmtInput(el.margin); marginR.value=numVal(el.margin.value); calc(); });
+  // оклад и план-маржа с разделением тысяч
+  ['oklad','planM'].forEach(function(k){ el[k].addEventListener('input',function(){ fmtInput(el[k]); calc(); }); });
+  ['planC','first'].forEach(function(k){ el[k].addEventListener('input',calc); });
 
   function setSliders(senior){
     marginR.max = senior?100000:30000;
     clientsR.max = senior?40:10;
-    marginR.value = el.margin.value; clientsR.value = el.clients.value;
+    marginR.value = numVal(el.margin.value); clientsR.value = el.clients.value;
   }
   el.fund.addEventListener('change',function(){
     var sr=(el.fund.value==='80');
@@ -312,11 +319,13 @@ details[open] summary .chev{transform:rotate(90deg);}
     el.planC.value  = sr?15:3;
     el.margin.value = sr?50000:5000;   // пример-факт под период
     el.clients.value= sr?15:3;
+    fmtInput(el.oklad); fmtInput(el.planM); fmtInput(el.margin);
     setSliders(sr);
     calc();
   });
 
   load();
+  fmtInput(el.oklad); fmtInput(el.planM); fmtInput(el.margin);
   setSliders(el.fund.value==='80');
   calc();
 })();
