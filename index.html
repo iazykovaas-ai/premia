@@ -307,6 +307,7 @@ details[open] summary .chev{transform:rotate(90deg);}
   }
   el.fund.addEventListener('change',function(){
     var sr=(el.fund.value==='80');
+    el.oklad.value  = sr?400000:250000; // оклад по умолчанию под уровень
     el.planM.value  = sr?45000:5000;   // план за квартал / за месяц
     el.planC.value  = sr?15:3;
     el.margin.value = sr?45000:5000;   // пример-факт под период
