@@ -1,0 +1,285 @@
+<title>Премия сэйла</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#e9eeec; --surface:#ffffff; --surface2:#f2f6f4; --inset:#eaf1ef;
+  --ink:#1f2e33; --muted:#5d6d71; --line:#d8e1de;
+  --deep:#264653; --accent:#1f8778; --accent-soft:#e2f1ee; --accent-strong:#176b5f;
+  --gold:#d4a03a; --warn:#c0392b; --warn-soft:#fbeae7;
+  --grey-bar:#c3cdcb;
+  --shadow:0 1px 2px rgba(24,44,50,.06),0 8px 24px rgba(24,44,50,.07);
+  font-family:'Manrope',system-ui,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14232a; --surface:#1d2e36; --surface2:#233842; --inset:#182a31;
+  --ink:#e9f1ef; --muted:#9db0b4; --line:#33474f;
+  --deep:#0e1a20; --accent:#38b3a2; --accent-soft:#1c3a3a; --accent-strong:#69d2c5;
+  --gold:#e9c46a; --warn:#e5736a; --warn-soft:#3a2320;
+  --grey-bar:#4a5b60;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+}}
+:root[data-theme="dark"]{
+  --bg:#14232a; --surface:#1d2e36; --surface2:#233842; --inset:#182a31;
+  --ink:#e9f1ef; --muted:#9db0b4; --line:#33474f;
+  --deep:#0e1a20; --accent:#38b3a2; --accent-soft:#1c3a3a; --accent-strong:#69d2c5;
+  --gold:#e9c46a; --warn:#e5736a; --warn-soft:#3a2320;
+  --grey-bar:#4a5b60;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);margin:0;line-height:1.5;
+  -webkit-font-smoothing:antialiased;font-feature-settings:"tnum";}
+.wrap{max-width:960px;margin:0 auto;padding:24px 18px 40px;}
+h1{font-size:clamp(1.5rem,4vw,2rem);font-weight:800;margin:0;letter-spacing:-.02em;text-wrap:balance;}
+.sub{color:var(--muted);margin:6px 0 0;font-size:1rem;font-weight:500;}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px;}
+.badge{background:var(--deep);color:#fff;border-radius:999px;padding:7px 14px;font-size:.8rem;font-weight:700;white-space:nowrap;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+@media (max-width:720px){.grid{grid-template-columns:1fr;}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:22px;}
+.card h2{font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 15px;}
+.card h2.mt{margin-top:24px;}
+.field{margin-bottom:20px;}
+.field:last-child{margin-bottom:0;}
+.flabel{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:9px;}
+.flabel span{font-weight:600;font-size:.98rem;}
+.valbox{display:inline-flex;align-items:baseline;gap:5px;font-family:'Manrope';font-weight:800;font-size:1.3rem;color:var(--accent-strong);
+  background:var(--inset);border:1px solid var(--line);border-radius:10px;padding:3px 11px;min-width:104px;justify-content:flex-end;}
+.valbox:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+.valbox input{font:inherit;color:inherit;background:none;border:0;outline:0;width:100%;text-align:right;}
+.valbox .unit{color:var(--muted);font-size:.82rem;font-weight:600;}
+/* оклад — крупное поле */
+.oklad-field{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:6px;}
+.oklad-field .lbl{font-weight:700;font-size:1.05rem;}
+.oklad-field .valbox{font-size:1.5rem;background:var(--surface);}
+input[type=range]{width:100%;height:26px;-webkit-appearance:none;appearance:none;background:none;cursor:pointer;margin:0;}
+input[type=range]::-webkit-slider-runnable-track{height:7px;border-radius:99px;background:var(--line);}
+input[type=range]::-moz-range-track{height:7px;border-radius:99px;background:var(--line);}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);border:3px solid var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.25);margin-top:-8px;}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);border:3px solid var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.25);}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px var(--accent-soft);}
+/* план-цель */
+.plan{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:15px 16px;margin-bottom:6px;}
+.plan-h{font-weight:700;font-size:.95rem;color:var(--accent-strong);margin-bottom:4px;display:flex;align-items:center;gap:7px;}
+.plan-hint{font-size:.8rem;color:var(--muted);margin-bottom:12px;}
+.plan-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.setfield{display:flex;flex-direction:column;gap:5px;}
+.setfield label{font-size:.8rem;color:var(--muted);font-weight:600;}
+.setfield input{font:inherit;font-weight:800;font-size:1.15rem;color:var(--accent-strong);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:8px 11px;outline:0;width:100%;}
+.setfield input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+details{margin-top:18px;border-top:1px dashed var(--line);padding-top:14px;}
+summary{cursor:pointer;font-weight:700;font-size:.9rem;color:var(--muted);list-style:none;display:flex;align-items:center;gap:7px;}
+summary::-webkit-details-marker{display:none;}
+summary .chev{transition:transform .2s;font-size:.75rem;}
+details[open] summary .chev{transform:rotate(90deg);}
+.settings{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;margin-top:14px;}
+.settings .setfield input{font-size:1rem;font-weight:700;color:var(--ink);background:var(--inset);}
+.chk{grid-column:1/-1;display:flex;align-items:center;gap:9px;font-size:.9rem;font-weight:600;color:var(--ink);cursor:pointer;margin-top:2px;}
+.chk input{width:18px;height:18px;accent-color:var(--accent);}
+/* result */
+.result{background:linear-gradient(160deg,var(--deep),#1a333d);border-color:transparent;color:#eaf3f1;}
+.result h2{color:#9fc0ba;}
+.income-label{font-size:.85rem;color:#9fc0ba;font-weight:600;margin:0;}
+.income{font-size:clamp(2.4rem,8vw,3.4rem);font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:2px 0 0;color:#fff;}
+.income .cur{font-size:.5em;font-weight:700;color:#9fc0ba;margin-left:4px;}
+.bar{height:34px;border-radius:9px;overflow:hidden;display:flex;background:rgba(255,255,255,.08);margin-top:16px;position:relative;}
+.bar .okl,.bar .prem{transition:width .25s ease;}
+.bar .okl{background:var(--grey-bar);}
+.bar .prem{background:var(--accent);}
+.bar .cap{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--gold);}
+.caplbl{font-size:.72rem;color:var(--gold);text-align:right;margin-top:5px;font-weight:600;}
+.split{display:flex;gap:8px;margin:12px 0 2px;font-size:.9rem;color:#cfe0dc;flex-wrap:wrap;}
+.split b{color:#fff;font-weight:700;}
+.metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,.12);border-radius:11px;overflow:hidden;margin-top:20px;}
+.metric{background:linear-gradient(160deg,var(--deep),#1a333d);padding:13px 10px;text-align:center;}
+.metric .m-num{font-size:1.3rem;font-weight:800;color:#fff;}
+.metric .m-lbl{font-size:.72rem;color:#9fc0ba;font-weight:600;margin-top:3px;line-height:1.25;}
+.metric.big .m-num{color:var(--gold);}
+.prem-line{display:flex;justify-content:space-between;align-items:baseline;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.14);}
+.prem-line .pl-lbl{font-size:.9rem;color:#cfe0dc;font-weight:600;}
+.prem-line .pl-val{font-size:1.5rem;font-weight:800;color:var(--gold);}
+.note{margin-top:16px;border-radius:11px;padding:12px 14px;font-size:.85rem;font-weight:600;display:none;align-items:flex-start;gap:8px;line-height:1.4;}
+.note.warn{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn);}
+.note.cap{background:rgba(212,160,58,.14);color:var(--gold);border:1px solid var(--gold);}
+.note.show{display:flex;}
+.foot{color:var(--muted);font-size:.82rem;margin-top:22px;line-height:1.55;}
+.foot b{color:var(--ink);}
+.foot .fla{color:var(--accent-strong);}
+</style>
+
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>Сколько я заработаю за месяц</h1>
+      <p class="sub">Впиши свой оклад и план, подвигай ползунки — увидишь премию и доход.</p>
+    </div>
+    <span class="badge">Сэйл · пилот</span>
+  </div>
+
+  <div class="grid">
+    <!-- ВВОД -->
+    <section class="card">
+      <h2>Мои данные</h2>
+
+      <div class="oklad-field">
+        <span class="lbl">Мой оклад</span>
+        <label class="valbox"><input id="oklad" type="number" min="0" max="2000000" step="10000" value="250000" inputmode="numeric" aria-label="Мой оклад в месяц"> <span class="unit">₽/мес</span></label>
+      </div>
+
+      <div class="plan">
+        <div class="plan-h">🎯 Мой план на месяц — это 100%</div>
+        <div class="plan-hint">Столько нужно, чтобы выполнить план полностью.</div>
+        <div class="plan-row">
+          <div class="setfield">
+            <label for="planM">Маржа, $/мес</label>
+            <input id="planM" type="number" min="0" step="500" value="10000" inputmode="numeric">
+          </div>
+          <div class="setfield">
+            <label for="planC">Новых клиентов</label>
+            <input id="planC" type="number" min="0" step="1" value="3" inputmode="numeric">
+          </div>
+        </div>
+      </div>
+
+      <h2 class="mt">Что я приведу за месяц (факт)</h2>
+      <div class="field">
+        <div class="flabel">
+          <span>Новых клиентов</span>
+          <label class="valbox"><input id="clients" type="number" min="0" max="30" step="1" value="3" inputmode="numeric" aria-label="Факт: новых клиентов"></label>
+        </div>
+        <input id="clientsR" type="range" min="0" max="10" step="1" value="3" aria-label="Клиенты, ползунок">
+      </div>
+      <div class="field">
+        <div class="flabel">
+          <span>Маржа этих клиентов</span>
+          <label class="valbox"><input id="margin" type="number" min="0" max="200000" step="500" value="12000" inputmode="numeric" aria-label="Факт: маржа"> <span class="unit">$/мес</span></label>
+        </div>
+        <input id="marginR" type="range" min="0" max="30000" step="500" value="12000" aria-label="Маржа, ползунок">
+      </div>
+
+      <details id="settings">
+        <summary><span class="chev">▶</span> Ещё настройки</summary>
+        <div class="settings">
+          <div class="setfield">
+            <label for="fund">Премфонд, % оклада (при 100%)</label>
+            <input id="fund" type="number" min="0" max="200" step="5" value="60" inputmode="numeric">
+          </div>
+          <label class="chk"><input id="first" type="checkbox"> Первый месяц работы (порогов нет)</label>
+        </div>
+      </details>
+    </section>
+
+    <!-- РЕЗУЛЬТАТ -->
+    <section class="card result">
+      <h2>Мой доход</h2>
+      <p class="income-label">Всего за месяц</p>
+      <div class="income"><span id="income">421 000</span><span class="cur">₽</span></div>
+
+      <div class="bar" aria-hidden="true">
+        <div class="okl" id="barOkl" style="width:40%"></div>
+        <div class="prem" id="barPrem" style="width:16%"></div>
+        <div class="cap" id="barCap" style="left:100%"></div>
+      </div>
+      <div class="caplbl">▲ потолок дохода (КЭП)</div>
+
+      <div class="split">
+        <span>Оклад <b id="sOkl">250 000 ₽</b></span><span>+</span>
+        <span>Премия <b id="sPrem">171 000 ₽</b></span>
+      </div>
+
+      <div class="prem-line">
+        <span class="pl-lbl">Премия за месяц</span>
+        <span class="pl-val"><span id="premBig">171 000</span> ₽</span>
+      </div>
+
+      <div class="metrics">
+        <div class="metric"><div class="m-num" id="vProfit">120%</div><div class="m-lbl">по марже<br>(вес 70%)</div></div>
+        <div class="metric"><div class="m-num" id="vClients">100%</div><div class="m-lbl">по клиентам<br>(вес 30%)</div></div>
+        <div class="metric big"><div class="m-num" id="vTotal">114%</div><div class="m-lbl">выполнение<br>плана</div></div>
+      </div>
+
+      <div class="note warn" id="noteWarn">⛔ <span></span></div>
+      <div class="note cap" id="noteCap">▲ <span>Выполнение достигло потолка (КЭП 250%). Выше премия не растёт — но план по тебе, скорее всего, пересмотрят вверх.</span></div>
+    </section>
+  </div>
+
+  <p class="foot">
+    <b>Как считается:</b> Премия = Оклад × Премфонд × Выполнение. Выполнение = <b>70%</b> по марже + <b>30%</b> по клиентам, каждое = факт ÷ план, с потолком (КЭП) <b>250%</b>.
+    <b>Обнулятор:</b> если по марже ниже 50% или по клиентам ниже 33% — премии за месяц нет (кроме первого месяца).
+    <span class="fla">Числа — пример; впиши свой оклад и план.</span>
+  </p>
+</div>
+
+<script>
+(function(){
+  var WM=0.70, WC=0.30, CAP=2.5, THR_M=0.5, THR_C=0.33;
+  var ids=['clients','margin','oklad','planM','planC','fund','first'];
+  var el={}; ids.forEach(function(i){el[i]=document.getElementById(i);});
+  var clientsR=document.getElementById('clientsR'), marginR=document.getElementById('marginR');
+
+  function fmt(n){return Math.round(n).toLocaleString('ru-RU');}
+  function pct(x){return Math.round(x*100)+'%';}
+
+  function load(){
+    try{var s=JSON.parse(localStorage.getItem('premia_seila')||'{}');
+      ['clients','margin','oklad','planM','planC','fund'].forEach(function(k){if(s[k]!=null)el[k].value=s[k];});
+      if(s.first!=null)el.first.checked=s.first;
+    }catch(e){}
+  }
+  function save(){
+    try{localStorage.setItem('premia_seila',JSON.stringify({
+      clients:el.clients.value,margin:el.margin.value,oklad:el.oklad.value,
+      planM:el.planM.value,planC:el.planC.value,fund:el.fund.value,first:el.first.checked
+    }));}catch(e){}
+  }
+
+  function calc(){
+    var clients=+el.clients.value||0, margin=+el.margin.value||0;
+    var oklad=+el.oklad.value||0, planM=+el.planM.value||0, planC=+el.planC.value||0;
+    var fund=(+el.fund.value||0)/100, first=el.first.checked;
+
+    var vm = planM>0 ? margin/planM : (margin>0?CAP:0);
+    var vc = planC>0 ? clients/planC : (clients>0?CAP:0);
+    var vmC=Math.min(CAP,vm), vcC=Math.min(CAP,vc);
+    var vit = WM*vmC + WC*vcC;
+
+    var gate = !first && (vm<THR_M || vc<THR_C);
+    var premium = gate ? 0 : oklad*fund*vit;
+    var income = oklad + premium;
+    var capped = (vm>CAP+1e-9 || vc>CAP+1e-9);
+
+    document.getElementById('income').textContent=fmt(income);
+    document.getElementById('premBig').textContent=fmt(premium);
+    document.getElementById('sOkl').textContent=fmt(oklad)+' ₽';
+    document.getElementById('sPrem').textContent=fmt(premium)+' ₽';
+    document.getElementById('vProfit').textContent=pct(vm);
+    document.getElementById('vClients').textContent=pct(vc);
+    document.getElementById('vTotal').textContent= gate ? '0%' : pct(vit);
+
+    var maxIncome = oklad*(1+fund*CAP) || 1;
+    document.getElementById('barOkl').style.width = Math.max(0,Math.min(100, oklad/maxIncome*100))+'%';
+    document.getElementById('barPrem').style.width = Math.max(0,Math.min(100, premium/maxIncome*100))+'%';
+
+    var nw=document.getElementById('noteWarn'), nc=document.getElementById('noteCap');
+    if(gate){
+      var why = vm<THR_M ? 'маржа ниже 50% плана' : 'клиентов меньше 33% плана';
+      nw.querySelector('span').textContent='Порог не пройден ('+why+') — премии за месяц нет, только оклад.';
+      nw.classList.add('show');
+    } else nw.classList.remove('show');
+    nc.classList.toggle('show', capped && !gate);
+
+    save();
+  }
+
+  function sync(a,b){ a.addEventListener('input',function(){b.value=a.value;calc();}); }
+  sync(clientsR, el.clients); sync(el.clients, clientsR);
+  sync(marginR, el.margin); sync(el.margin, marginR);
+  ['oklad','planM','planC','fund','first'].forEach(function(k){el[k].addEventListener('input',calc);});
+
+  load();
+  clientsR.value=el.clients.value; marginR.value=el.margin.value;
+  calc();
+})();
+</script>
