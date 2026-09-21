@@ -31,13 +31,19 @@
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);margin:0;line-height:1.5;
   -webkit-font-smoothing:antialiased;font-feature-settings:"tnum";}
-.wrap{max-width:960px;margin:0 auto;padding:24px 18px 40px;}
+.wrap{max-width:1000px;margin:0 auto;padding:24px 18px 40px;}
 h1{font-size:clamp(1.5rem,4vw,2rem);font-weight:800;margin:0;letter-spacing:-.02em;text-wrap:balance;}
 .sub{color:var(--muted);margin:6px 0 0;font-size:1rem;font-weight:500;}
 .head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px;}
 .badge{background:var(--deep);color:#fff;border-radius:999px;padding:7px 14px;font-size:.8rem;font-weight:700;white-space:nowrap;}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
-@media (max-width:720px){.grid{grid-template-columns:1fr;}}
+#cData{grid-column:1;grid-row:1;}
+#cResult{grid-column:1;grid-row:2;}
+#cPool{grid-column:2;grid-row:1 / span 2;}
+@media (max-width:720px){
+  .grid{grid-template-columns:1fr;}
+  #cData,#cResult,#cPool{grid-column:auto;grid-row:auto;}
+}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:22px;}
 .card h2{font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 15px;}
 .card h2.mt{margin-top:24px;}
@@ -78,6 +84,22 @@ details[open] summary .chev{transform:rotate(90deg);}
 .settings .setfield input{font-size:1rem;font-weight:700;color:var(--ink);background:var(--inset);}
 .chk{grid-column:1/-1;display:flex;align-items:center;gap:9px;font-size:.9rem;font-weight:600;color:var(--ink);cursor:pointer;margin-top:2px;}
 .chk input{width:18px;height:18px;accent-color:var(--accent);}
+/* пул сделок */
+.pool-hint{font-size:.82rem;color:var(--muted);margin:-6px 0 16px;line-height:1.45;}
+.deal-row{display:grid;grid-template-columns:1fr 66px 1fr 28px;gap:8px;align-items:center;margin-bottom:8px;}
+.deal-head{font-size:.68rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
+.deal-head span{padding:0 2px;text-align:right;}
+.deal-head span:first-child{text-align:left;}
+.dcell{display:flex;align-items:center;background:var(--inset);border:1px solid var(--line);border-radius:9px;padding:7px 9px;}
+.dcell:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+.dcell input{font:inherit;font-weight:700;color:var(--ink);background:none;border:0;outline:0;width:100%;text-align:right;}
+.d-marg{font-weight:800;color:var(--accent-strong);text-align:right;padding:7px 4px;font-size:1rem;white-space:nowrap;}
+.d-del{background:none;border:0;color:var(--muted);font-size:1.25rem;line-height:1;cursor:pointer;padding:2px 4px;border-radius:7px;}
+.d-del:hover{color:var(--warn);background:var(--warn-soft);}
+.addDeal{margin-top:6px;width:100%;background:var(--accent-soft);color:var(--accent-strong);border:1px dashed var(--accent);border-radius:10px;padding:11px;font:inherit;font-weight:700;cursor:pointer;}
+.addDeal:hover{background:var(--accent);color:#fff;}
+.deal-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:18px;padding-top:15px;border-top:1px solid var(--line);font-weight:700;font-size:.95rem;}
+.deal-total b{font-size:1.5rem;font-weight:800;color:var(--accent-strong);}
 /* result */
 .result{background:linear-gradient(160deg,var(--deep),#1a333d);border-color:transparent;color:#eaf3f1;}
 .result h2{color:#9fc0ba;}
@@ -113,14 +135,14 @@ details[open] summary .chev{transform:rotate(90deg);}
   <div class="head">
     <div>
       <h1>Сколько я заработаю за месяц</h1>
-      <p class="sub">Впиши свой оклад и план, подвигай ползунки — увидишь премию и доход.</p>
+      <p class="sub">Впиши оклад и план, внеси сделки справа — маржа и премия посчитаются сами.</p>
     </div>
     <span class="badge">Сэйл · пилот</span>
   </div>
 
   <div class="grid">
     <!-- ВВОД -->
-    <section class="card">
+    <section class="card" id="cData">
       <h2>Мои данные</h2>
 
       <div class="oklad-field">
@@ -143,20 +165,13 @@ details[open] summary .chev{transform:rotate(90deg);}
         </div>
       </div>
 
-      <h2 class="mt" id="factH">Что я приведу за месяц (факт)</h2>
+      <h2 class="mt" id="factH">Сколько клиентов приведу (факт)</h2>
       <div class="field">
         <div class="flabel">
           <span>Новых клиентов</span>
           <label class="valbox"><input id="clients" type="number" min="0" max="30" step="1" value="3" inputmode="numeric" aria-label="Факт: новых клиентов"></label>
         </div>
         <input id="clientsR" type="range" min="0" max="10" step="1" value="3" aria-label="Клиенты, ползунок">
-      </div>
-      <div class="field">
-        <div class="flabel">
-          <span>Маржа этих клиентов</span>
-          <label class="valbox"><input id="margin" type="text" value="5000" inputmode="numeric" aria-label="Факт: маржа"> <span class="unit" id="marginUnit">$/мес</span></label>
-        </div>
-        <input id="marginR" type="range" min="0" max="30000" step="500" value="5000" aria-label="Маржа, ползунок">
       </div>
 
       <details id="settings" open>
@@ -176,8 +191,20 @@ details[open] summary .chev{transform:rotate(90deg);}
       </details>
     </section>
 
+    <!-- ПУЛ СДЕЛОК -->
+    <section class="card" id="cPool">
+      <h2 id="poolH">Пул сделок за месяц</h2>
+      <p class="pool-hint">Вноси сделки, как ты их видишь: <b>сумма сделки</b> и <b>комиссия %</b>. Маржа по каждой и общий итог посчитаются сами и уйдут в расчёт премии.</p>
+      <div class="deal-row deal-head">
+        <span>Сумма сделки, $</span><span>Ком., %</span><span>Маржа, $</span><span></span>
+      </div>
+      <div id="deals"></div>
+      <button type="button" id="addDeal" class="addDeal">+ Добавить сделку</button>
+      <div class="deal-total"><span id="dealTotalLbl">Итого маржа за месяц</span><b id="dealTotal">0 $</b></div>
+    </section>
+
     <!-- РЕЗУЛЬТАТ -->
-    <section class="card result">
+    <section class="card result" id="cResult">
       <h2>Мой доход</h2>
       <p class="income-label" id="incLbl">Всего за месяц</p>
       <div class="income"><span id="income">0</span><span class="cur">₽</span></div>
@@ -211,39 +238,88 @@ details[open] summary .chev{transform:rotate(90deg);}
   </div>
 
   <p class="foot">
-    <b>Как считается:</b> Премия = Оклад × Премфонд × Выполнение. Выполнение = <b>70%</b> по марже + <b>30%</b> по клиентам, каждое = факт ÷ план, с потолком (КЭП) <b>250%</b>.
-    <b>Обнулятор:</b> если по марже ниже 50% или по клиентам ниже 33% — премии за месяц нет (кроме первого месяца).
-    <span class="fla">Числа — пример; впиши свой оклад и план.</span>
+    <b>Маржа</b> берётся из пула сделок: по каждой сделке маржа = сумма × комиссия %, а в расчёт идёт их сумма.
+    <b>Как считается премия:</b> Оклад × Доля премии × Выполнение. Выполнение = <b>70%</b> по марже + <b>30%</b> по клиентам, каждое = факт ÷ план, с потолком (КЭП) <b>250%</b>.
+    <b>Обнулятор:</b> если по марже ниже 50% или по клиентам ниже 33% — премии за период нет (кроме первого месяца).
+    <span class="fla">Сделки — пример; замени на свои.</span>
   </p>
 </div>
 
 <script>
 (function(){
   var WM=0.70, WC=0.30, CAP=2.5, THR_M=0.5, THR_C=0.33;
-  var ids=['clients','margin','oklad','planM','planC','fund','first'];
+  var ids=['clients','oklad','planM','planC','fund','first'];
   var el={}; ids.forEach(function(i){el[i]=document.getElementById(i);});
-  var clientsR=document.getElementById('clientsR'), marginR=document.getElementById('marginR');
+  var clientsR=document.getElementById('clientsR');
+  var dealsBox=document.getElementById('deals');
+  var totalMargin=0;
 
   function fmt(n){return Math.round(n).toLocaleString('ru-RU');}
   function pct(x){return Math.round(x*100)+'%';}
   function numVal(v){var n=parseFloat(String(v).replace(/[^\d.-]/g,''));return isFinite(n)?n:0;}
+  function commVal(v){var n=parseFloat(String(v).replace(',','.').replace(/[^\d.]/g,''));return isFinite(n)?n:0;}
   function fmtInput(e){var d=e.value.replace(/\D/g,'');e.value=d?(+d).toLocaleString('ru-RU'):'';}
 
+  /* ---------- пул сделок ---------- */
+  function addDealRow(sum, comm){
+    var row=document.createElement('div'); row.className='deal-row';
+    row.innerHTML='<label class="dcell"><input type="text" inputmode="numeric" class="d-sum" placeholder="0" aria-label="Сумма сделки"></label>'
+      +'<label class="dcell"><input type="text" inputmode="decimal" class="d-comm" placeholder="0" aria-label="Комиссия, %"></label>'
+      +'<span class="d-marg">0</span>'
+      +'<button type="button" class="d-del" title="Удалить сделку" aria-label="Удалить сделку">×</button>';
+    var s=row.querySelector('.d-sum'), c=row.querySelector('.d-comm'), del=row.querySelector('.d-del');
+    if(sum!=null && sum!=='') s.value=fmt(sum);
+    if(comm!=null && comm!=='') c.value=String(comm).replace('.',',');
+    s.addEventListener('input',function(){fmtInput(s);recalcDeals();});
+    c.addEventListener('input',function(){recalcDeals();});
+    del.addEventListener('click',function(){row.parentNode.removeChild(row);recalcDeals();});
+    dealsBox.appendChild(row);
+  }
+  function gatherDeals(){
+    var arr=[], rows=dealsBox.querySelectorAll('.deal-row');
+    for(var i=0;i<rows.length;i++){
+      arr.push({sum:numVal(rows[i].querySelector('.d-sum').value),
+                comm:commVal(rows[i].querySelector('.d-comm').value)});
+    }
+    return arr;
+  }
+  function recalcDeals(){
+    var rows=dealsBox.querySelectorAll('.deal-row'), total=0;
+    for(var i=0;i<rows.length;i++){
+      var s=numVal(rows[i].querySelector('.d-sum').value);
+      var c=commVal(rows[i].querySelector('.d-comm').value);
+      var mg=s*c/100;
+      rows[i].querySelector('.d-marg').textContent=fmt(mg);
+      total+=mg;
+    }
+    totalMargin=total;
+    document.getElementById('dealTotal').textContent=fmt(total)+' $';
+    calc();
+  }
+  function exampleDeals(senior){
+    return senior
+      ? [{sum:1000000,comm:2},{sum:800000,comm:2},{sum:700000,comm:2}]  // ≈ 50 000 $ за квартал
+      : [{sum:250000,comm:2}];                                          // = 5 000 $ за месяц
+  }
+
+  /* ---------- память ---------- */
   function load(){
     try{var s=JSON.parse(localStorage.getItem('premia_seila')||'{}');
-      ['clients','margin','oklad','planM','planC','fund'].forEach(function(k){if(s[k]!=null)el[k].value=s[k];});
+      ['clients','oklad','planM','planC','fund'].forEach(function(k){if(s[k]!=null)el[k].value=s[k];});
       if(s.first!=null)el.first.checked=s.first;
+      if(Array.isArray(s.deals))window.__deals=s.deals;
     }catch(e){}
   }
   function save(){
     try{localStorage.setItem('premia_seila',JSON.stringify({
-      clients:el.clients.value,margin:el.margin.value,oklad:el.oklad.value,
-      planM:el.planM.value,planC:el.planC.value,fund:el.fund.value,first:el.first.checked
+      clients:el.clients.value,oklad:el.oklad.value,planM:el.planM.value,planC:el.planC.value,
+      fund:el.fund.value,first:el.first.checked,deals:gatherDeals()
     }));}catch(e){}
   }
 
+  /* ---------- расчёт премии ---------- */
   function calc(){
-    var clients=+el.clients.value||0, margin=numVal(el.margin.value);
+    var clients=+el.clients.value||0, margin=totalMargin;
     var oklad=numVal(el.oklad.value), planM=numVal(el.planM.value), planC=+el.planC.value||0;
     var fund=(+el.fund.value||0)/100;
     var senior=(el.fund.value==='80'); var M=senior?3:1;   // старший = за квартал (3 мес)
@@ -252,8 +328,8 @@ details[open] summary .chev{transform:rotate(90deg);}
     document.getElementById('premLbl').textContent='Премия за '+per;
     document.getElementById('planH').textContent='🎯 Мой план на '+per+' — это 100%';
     document.getElementById('planMlbl').textContent='Маржа, $/'+perU;
-    document.getElementById('factH').textContent='Что я приведу за '+per+' (факт)';
-    document.getElementById('marginUnit').textContent='$/'+perU;
+    document.getElementById('poolH').textContent='Пул сделок за '+per;
+    document.getElementById('dealTotalLbl').textContent='Итого маржа за '+per;
     document.getElementById('seniorNote').style.display=senior?'block':'none';
     // до 1 октября 2026 — пилот без порогов (автоматически); галочка — ручной запас
     var autoFirst = (new Date() < new Date(2026,9,1));
@@ -297,36 +373,34 @@ details[open] summary .chev{transform:rotate(90deg);}
     save();
   }
 
+  /* ---------- события ---------- */
   function sync(a,b){ a.addEventListener('input',function(){b.value=a.value;calc();}); }
-  // клиенты — обычные числа
   sync(clientsR, el.clients); sync(el.clients, clientsR);
-  // маржа-факт с разделением тысяч
-  marginR.addEventListener('input',function(){ el.margin.value=(+marginR.value).toLocaleString('ru-RU'); calc(); });
-  el.margin.addEventListener('input',function(){ fmtInput(el.margin); marginR.value=numVal(el.margin.value); calc(); });
-  // оклад и план-маржа с разделением тысяч
   ['oklad','planM'].forEach(function(k){ el[k].addEventListener('input',function(){ fmtInput(el[k]); calc(); }); });
   ['planC','first'].forEach(function(k){ el[k].addEventListener('input',calc); });
+  document.getElementById('addDeal').addEventListener('click',function(){ addDealRow('',''); });
 
-  function setSliders(senior){
-    marginR.max = senior?100000:30000;
-    clientsR.max = senior?40:10;
-    marginR.value = numVal(el.margin.value); clientsR.value = el.clients.value;
-  }
+  function setSliders(senior){ clientsR.max=senior?40:10; clientsR.value=el.clients.value; }
+
   el.fund.addEventListener('change',function(){
     var sr=(el.fund.value==='80');
     el.oklad.value  = 0;                // оклад вводит сам — и менеджер, и старший
     el.planM.value  = sr?50000:5000;   // план за квартал / за месяц
     el.planC.value  = sr?15:3;
-    el.margin.value = sr?50000:5000;   // пример-факт под период
     el.clients.value= sr?15:3;
-    fmtInput(el.oklad); fmtInput(el.planM); fmtInput(el.margin);
+    fmtInput(el.oklad); fmtInput(el.planM);
+    dealsBox.innerHTML='';
+    exampleDeals(sr).forEach(function(d){addDealRow(d.sum,d.comm);});
     setSliders(sr);
-    calc();
+    recalcDeals();
   });
 
+  /* ---------- старт ---------- */
   load();
-  fmtInput(el.oklad); fmtInput(el.planM); fmtInput(el.margin);
+  fmtInput(el.oklad); fmtInput(el.planM);
+  var saved=window.__deals;
+  (saved && saved.length ? saved : exampleDeals(el.fund.value==='80')).forEach(function(d){ addDealRow(d.sum,d.comm); });
   setSliders(el.fund.value==='80');
-  calc();
+  recalcDeals();
 })();
 </script>
