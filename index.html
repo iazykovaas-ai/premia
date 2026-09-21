@@ -259,6 +259,7 @@ details[open] summary .chev{transform:rotate(90deg);}
   function numVal(v){var n=parseFloat(String(v).replace(/[^\d.-]/g,''));return isFinite(n)?n:0;}
   function commVal(v){var n=parseFloat(String(v).replace(',','.').replace(/[^\d.]/g,''));return isFinite(n)?n:0;}
   function fmtInput(e){var d=e.value.replace(/\D/g,'');e.value=d?(+d).toLocaleString('ru-RU'):'';}
+  function fmtSigned(e){var neg=e.value.replace(/[^\d-]/g,'').indexOf('-')!==-1;var d=e.value.replace(/\D/g,'');e.value=(neg?'-':'')+(d?(+d).toLocaleString('ru-RU'):'');}
 
   /* ---------- пул сделок (маржа по сделке) ---------- */
   function addDealRow(marg){
@@ -267,7 +268,7 @@ details[open] summary .chev{transform:rotate(90deg);}
       +'<button type="button" class="d-del" title="Удалить сделку" aria-label="Удалить сделку">×</button>';
     var m=row.querySelector('.d-marg-in'), del=row.querySelector('.d-del');
     if(marg!=null && marg!=='') m.value=fmt(marg);
-    m.addEventListener('input',function(){fmtInput(m);recalcDeals();});
+    m.addEventListener('input',function(){fmtSigned(m);recalcDeals();});
     del.addEventListener('click',function(){row.parentNode.removeChild(row);recalcDeals();});
     dealsBox.appendChild(row);
   }
@@ -338,7 +339,7 @@ details[open] summary .chev{transform:rotate(90deg);}
 
     var gate = !first && (vm<THR_M || vc<THR_C);
     var base = oklad*M;                          // оклад за период (мес или квартал)
-    var premium = gate ? 0 : base*fund*vit;
+    var premium = gate ? 0 : Math.max(0, base*fund*vit);   // при минусовой марже премия не уходит в минус
     var income = base + premium;
     var capped = (vm>CAP+1e-9 || vc>CAP+1e-9);
 
