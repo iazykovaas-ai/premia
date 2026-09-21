@@ -86,7 +86,7 @@ details[open] summary .chev{transform:rotate(90deg);}
 .chk input{width:18px;height:18px;accent-color:var(--accent);}
 /* пул сделок */
 .pool-hint{font-size:.82rem;color:var(--muted);margin:-6px 0 16px;line-height:1.45;}
-.deal-row{display:grid;grid-template-columns:1fr 66px 1fr 28px;gap:8px;align-items:center;margin-bottom:8px;}
+.deal-row{display:grid;grid-template-columns:1fr 28px;gap:8px;align-items:center;margin-bottom:8px;}
 .deal-head{font-size:.68rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
 .deal-head span{padding:0 2px;text-align:right;}
 .deal-head span:first-child{text-align:left;}
@@ -194,9 +194,9 @@ details[open] summary .chev{transform:rotate(90deg);}
     <!-- ПУЛ СДЕЛОК -->
     <section class="card" id="cPool">
       <h2 id="poolH">Пул сделок за месяц</h2>
-      <p class="pool-hint">Вноси сделки, как ты их видишь: <b>сумма сделки</b> и <b>комиссия %</b>. Маржа по каждой и общий итог посчитаются сами и уйдут в расчёт премии.</p>
+      <p class="pool-hint">Вноси <b>маржу по каждой сделке</b> — как ты её видишь. Общий итог посчитается сам и уйдёт в расчёт премии.</p>
       <div class="deal-row deal-head">
-        <span>Сумма сделки, $</span><span>Ком., %</span><span>Маржа, $</span><span></span>
+        <span>Маржа по сделке, $</span><span></span>
       </div>
       <div id="deals"></div>
       <button type="button" id="addDeal" class="addDeal">+ Добавить сделку</button>
@@ -260,46 +260,38 @@ details[open] summary .chev{transform:rotate(90deg);}
   function commVal(v){var n=parseFloat(String(v).replace(',','.').replace(/[^\d.]/g,''));return isFinite(n)?n:0;}
   function fmtInput(e){var d=e.value.replace(/\D/g,'');e.value=d?(+d).toLocaleString('ru-RU'):'';}
 
-  /* ---------- пул сделок ---------- */
-  function addDealRow(sum, comm){
+  /* ---------- пул сделок (маржа по сделке) ---------- */
+  function addDealRow(marg){
     var row=document.createElement('div'); row.className='deal-row';
-    row.innerHTML='<label class="dcell"><input type="text" inputmode="numeric" class="d-sum" placeholder="0" aria-label="Сумма сделки"></label>'
-      +'<label class="dcell"><input type="text" inputmode="decimal" class="d-comm" placeholder="0" aria-label="Комиссия, %"></label>'
-      +'<span class="d-marg">0</span>'
+    row.innerHTML='<label class="dcell"><input type="text" inputmode="numeric" class="d-marg-in" placeholder="0" aria-label="Маржа по сделке"></label>'
       +'<button type="button" class="d-del" title="Удалить сделку" aria-label="Удалить сделку">×</button>';
-    var s=row.querySelector('.d-sum'), c=row.querySelector('.d-comm'), del=row.querySelector('.d-del');
-    if(sum!=null && sum!=='') s.value=fmt(sum);
-    if(comm!=null && comm!=='') c.value=String(comm).replace('.',',');
-    s.addEventListener('input',function(){fmtInput(s);recalcDeals();});
-    c.addEventListener('input',function(){recalcDeals();});
+    var m=row.querySelector('.d-marg-in'), del=row.querySelector('.d-del');
+    if(marg!=null && marg!=='') m.value=fmt(marg);
+    m.addEventListener('input',function(){fmtInput(m);recalcDeals();});
     del.addEventListener('click',function(){row.parentNode.removeChild(row);recalcDeals();});
     dealsBox.appendChild(row);
   }
   function gatherDeals(){
     var arr=[], rows=dealsBox.querySelectorAll('.deal-row');
-    for(var i=0;i<rows.length;i++){
-      arr.push({sum:numVal(rows[i].querySelector('.d-sum').value),
-                comm:commVal(rows[i].querySelector('.d-comm').value)});
-    }
+    for(var i=0;i<rows.length;i++){ arr.push(numVal(rows[i].querySelector('.d-marg-in').value)); }
     return arr;
   }
   function recalcDeals(){
     var rows=dealsBox.querySelectorAll('.deal-row'), total=0;
-    for(var i=0;i<rows.length;i++){
-      var s=numVal(rows[i].querySelector('.d-sum').value);
-      var c=commVal(rows[i].querySelector('.d-comm').value);
-      var mg=s*c/100;
-      rows[i].querySelector('.d-marg').textContent=fmt(mg);
-      total+=mg;
-    }
+    for(var i=0;i<rows.length;i++){ total+=numVal(rows[i].querySelector('.d-marg-in').value); }
     totalMargin=total;
     document.getElementById('dealTotal').textContent=fmt(total)+' $';
     calc();
   }
   function exampleDeals(senior){
-    return senior
-      ? [{sum:1000000,comm:2},{sum:800000,comm:2},{sum:700000,comm:2}]  // ≈ 50 000 $ за квартал
-      : [{sum:250000,comm:2}];                                          // = 5 000 $ за месяц
+    return senior ? [20000,16000,14000]   // = 50 000 $ за квартал
+                  : [5000];               // = 5 000 $ за месяц
+  }
+  // маржа из сохранённого элемента (число, или старый формат {sum,comm}/{marg})
+  function dealMarg(d){
+    if(d==null) return 0;
+    if(typeof d==='object') return d.marg!=null ? +d.marg : (+d.sum||0)*(+d.comm||0)/100;
+    return +d||0;
   }
 
   /* ---------- память ---------- */
@@ -390,7 +382,7 @@ details[open] summary .chev{transform:rotate(90deg);}
     el.clients.value= sr?15:3;
     fmtInput(el.oklad); fmtInput(el.planM);
     dealsBox.innerHTML='';
-    exampleDeals(sr).forEach(function(d){addDealRow(d.sum,d.comm);});
+    exampleDeals(sr).forEach(function(d){addDealRow(d);});
     setSliders(sr);
     recalcDeals();
   });
@@ -399,7 +391,7 @@ details[open] summary .chev{transform:rotate(90deg);}
   load();
   fmtInput(el.oklad); fmtInput(el.planM);
   var saved=window.__deals;
-  (saved && saved.length ? saved : exampleDeals(el.fund.value==='80')).forEach(function(d){ addDealRow(d.sum,d.comm); });
+  (saved && saved.length ? saved : exampleDeals(el.fund.value==='80')).forEach(function(d){ addDealRow(dealMarg(d)); });
   setSliders(el.fund.value==='80');
   recalcDeals();
 })();
